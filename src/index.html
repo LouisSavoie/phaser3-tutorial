@@ -86,6 +86,25 @@
         // CREATE PLAYER/PLATFORMS COLLIDER
         this.physics.add.collider(player, platforms);
 
+        // CREATE STARS
+        stars = this.physics.add.group({
+            key: 'star',
+            repeat: 11,
+            setXY: { x: 12, y: 0, stepX: 70 }
+        });
+
+        stars.children.iterate(function (child) {
+
+            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+
+        });
+
+        // CREATE STARS/PLATFORM COLLIDER
+        this.physics.add.collider(stars, platforms);
+
+        // CREATE STARS/PLAYER OVERLAP (STAR COLLECTION)
+        this.physics.add.overlap(player, stars, collectStar, null, this);
+
         // CREATE CURSORS
         cursors = this.input.keyboard.createCursorKeys();
     }
@@ -106,6 +125,11 @@
         if (cursors.up.isDown && player.body.touching.down) {
             player.setVelocityY(-330);
         }
+    }
+
+    // STAR COLLECTION
+    function collectStar (player, star) {
+        star.disableBody(true, true);
     }
 
 </script>
