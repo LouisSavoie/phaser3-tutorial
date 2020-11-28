@@ -114,6 +114,13 @@
 
         // CREATE SCORE
         scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+
+        // CREATE BOMBS
+        bombs = this.physics.add.group();
+
+        // CREATE BOMBS COLLIDERS
+        this.physics.add.collider(bombs, platforms);
+        this.physics.add.collider(player, bombs, hitBomb, null, this);
     }
 
     function update () {
@@ -137,9 +144,31 @@
     // STAR COLLECTION
     function collectStar (player, star) {
         star.disableBody(true, true);
-            
+        // update score
         score += 10;
         scoreText.setText('Score: ' + score);
+        // if all stars have been collected
+        if (stars.countActive(true) === 0) {
+            // drop stars again
+            stars.children.iterate(function (child) {
+                child.enableBody(true, child.x, 0, true, true);
+            });
+            // generate random location away from player fro new bomb
+            var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+            // create new bomb
+            var bomb = bombs.create(x, 16, 'bomb');
+            bomb.setBounce(1);
+            bomb.setCollideWorldBounds(true);
+            bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        }
+    }
+
+    // PLAYER COLLIDES WITH BOMB
+    function hitBomb (player, bomb) {
+        this.physics.pause();
+        player.setTint(0xff0000);
+        player.anims.play('turn');
+        gameOver = true;
     }
 
 </script>
